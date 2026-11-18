@@ -1,0 +1,66 @@
+# Sveltia CMS — https://sveltiacms.app/en/docs
+# Sign in at /journal/admin/ with "Sign In with Token": a fine-grained GitHub
+# token with access to willchambers/journal, Contents: Read and write. See README.md.
+
+backend:
+  name: github
+  repo: willchambers/journal
+  branch: main
+  commit_messages:
+    create: "Add {{collection}} “{{slug}}”"
+    update: "Update {{collection}} “{{slug}}”"
+    delete: "Delete {{collection}} “{{slug}}”"
+    uploadMedia: "Upload “{{path}}”"
+    deleteMedia: "Delete “{{path}}”"
+
+site_url: https://willchambers.github.io/journal/
+display_url: https://willchambers.github.io/journal/
+
+# Content stores images as "/assets/uploads/…" (no /journal/ prefix); the build
+# adds the prefix to every link.
+media_folder: src/assets/uploads
+public_folder: /assets/uploads
+
+# Images are converted to WebP and capped at 2400px on the long side before
+# they're committed. The build then makes smaller copies.
+media_libraries:
+  all:
+    transformations:
+      raster_image:
+        format: webp
+        quality: 85
+        width: 2400
+        height: 2400
+    max_file_size: 26214400
+
+slug:
+  encoding: ascii
+  clean_accents: true
+
+collections:
+  - name: posts
+    label: Posts
+    label_singular: Post
+    folder: src/posts
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    summary: "{{title}}"
+    sortable_fields: [date, title]
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Date, name: date, widget: datetime }
+      - { label: Summary, name: summary, widget: text, required: false, hint: "Shown under the title and in link previews." }
+      - { label: Cover image, name: image, widget: image, required: false }
+      - { label: Cover alt text, name: image_alt, widget: string, required: false }
+      - { label: Topics, name: topics, widget: list, required: false }
+      - { label: Body, name: body, widget: markdown }
+
+  - name: site
+    label: Site
+    files:
+      - name: profile
+        label: Page text
+        file: src/_data/profile.yml
+        fields:
+          - { label: Headline, name: heading, widget: string }
+          - { label: Intro, name: intro, widget: text }
